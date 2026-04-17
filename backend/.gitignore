@@ -1,0 +1,33 @@
+# Dependencies
+/vendor/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Composer lock (optional: remove this line if you want to commit it)
+# composer.lock
+
+# PHP cache & logs
+*.log
+*.cache
+/cache/
+/logs/
+/tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# PHP error logs
+php_errors.log
+error_log
