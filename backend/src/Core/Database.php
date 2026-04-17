@@ -10,7 +10,7 @@ class Database
     private function __construct()
     {
         $this->baseUrl = rtrim($_ENV['SUPABASE_URL'], '/') . '/rest/v1';
-        $this->apiKey = $_ENV['SUPABASE_KEY'];
+        $this->apiKey = $_ENV['SUPABASE_ANON_KEY'];
     }
 
     public static function getInstance(): self
