@@ -24,21 +24,9 @@ class Database
     public function query(string $table, array $params = []): array
     {
         $url = $this->baseUrl . '/' . $table;
-
         if (!empty($params)) {
-        //     if (!empty($params)) {
-        //     $url .= '?' . http_build_query($params);
-        // }
-            // http_build_query encodes dots as %2E, breaking PostgREST operators
-            // like eq.value, gt.value, etc. Build the query string manually.
-            $parts = [];
-            foreach ($params as $key => $value) {
-                $parts[] = urlencode($key) . '=' . $value; // value NOT encoded
-            }
-            $url .= '?' . implode('&', $parts);
+            $url .= '?' . $this->buildQuery($params);
         }
-
-        error_log("DEBUG URL: " . $url);
         return $this->request('GET', $url);
     }
 
@@ -51,14 +39,23 @@ class Database
 
     public function update(string $table, array $data, array $filters): array
     {
-        $url = $this->baseUrl . '/' . $table . '?' . http_build_query($filters);
+        $url = $this->baseUrl . '/' . $table . '?' . $this->buildQuery($filters);
         return $this->request('PATCH', $url, $data, ['Prefer: return=representation']);
     }
 
     public function delete(string $table, array $filters): array
     {
-        $url = $this->baseUrl . '/' . $table . '?' . http_build_query($filters);
+        $url = $this->baseUrl . '/' . $table . '?' . $this->buildQuery($filters);
         return $this->request('DELETE', $url);
+    }
+    // Helper to build query string for filters
+    private function buildQuery(array $filters): string
+    {
+        $parts = [];
+        foreach ($filters as $key => $value) {
+            $parts[] = urlencode($key) . '=' . $value;
+        }
+        return implode('&', $parts);
     }
 
    private function request(string $method, string $url, array $body = [], array $extraHeaders = []): array
@@ -89,20 +86,20 @@ class Database
     }
 
     // Debug request
-    error_log("DEBUG HEADERS SENT: " . implode(' | ', $headers));
-    error_log("DEBUG FULL URL: " . $url);
+    // error_log("DEBUG HEADERS SENT: " . implode(' | ', $headers));
+    // error_log("DEBUG FULL URL: " . $url);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-    if (curl_errno($ch)) {
-        error_log("CURL ERROR CODE: " . curl_errno($ch));
-        error_log("CURL ERROR MSG: " . curl_error($ch));
-    }
+    // if (curl_errno($ch)) {
+    //     error_log("CURL ERROR CODE: " . curl_errno($ch));
+    //     error_log("CURL ERROR MSG: " . curl_error($ch));
+    // }
 
     // Debug response
-    error_log("DEBUG HTTP CODE: " . $httpCode);
-    error_log("DEBUG RESPONSE: " . $response);
+    // error_log("DEBUG HTTP CODE: " . $httpCode);
+    // error_log("DEBUG RESPONSE: " . $response);
 
     curl_close($ch);
 
