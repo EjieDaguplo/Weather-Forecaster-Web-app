@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import api from "@/app/lib/api";
 import Navbar from "@/app/components/Navbar";
-import UserTable from "@/app/admin/UserTable";
-import AdminStats from "@/app/admin/AdminStats";
+import UserTable from "@/app/admin/components/UserTable";
+import AdminStats from "@/app/admin/components/AdminStats";
 
 export default function AdminPage() {
   const router = useRouter();
