@@ -72,7 +72,7 @@ class Database
     ];
 
     // Debug cert
-    $certPath = 'C:/Users/ejiedags/Desktop/Weather/backend/cacert.pem';
+    $certPath = realpath(__DIR__ . '/../../cacert.pem');
     error_log("CERT EXISTS: " . (file_exists($certPath) ? 'YES' : 'NO'));
     error_log("CERT PATH: " . $certPath);
 
