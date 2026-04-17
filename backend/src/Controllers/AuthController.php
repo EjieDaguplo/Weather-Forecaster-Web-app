@@ -25,6 +25,10 @@ class AuthController
             'select' => 'id,username,password_hash,role,created_at',
         ]);
 
+        // DEBUG CHECK USER IN THE DATABASE
+        // echo json_encode($users, JSON_PRETTY_PRINT);
+        // exit();
+
         if (empty($users)) {
             Response::error('Invalid credentials', 401);
             return;

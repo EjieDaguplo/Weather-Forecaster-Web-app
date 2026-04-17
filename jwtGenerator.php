@@ -1,3 +1,3 @@
 <?php
-echo bin2hex(random_bytes(32));
+echo password_hash("password", PASSWORD_BCRYPT);
 ?>
