@@ -8,7 +8,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
 // CORS Headers
-$allowedOrigin = $_ENV['CORS_ORIGIN'] ?? 'http://localhost:3000';
+$allowedOrigin = $_ENV['CORS_ORIGIN'] ?? 'http://localhost:3000' ?? 'http://192.168.43.43:3000';
 header("Access-Control-Allow-Origin: $allowedOrigin");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
