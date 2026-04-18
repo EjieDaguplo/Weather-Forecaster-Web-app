@@ -52,7 +52,7 @@ class AuthController
             ],
         ]);
     }
-        // ── Register ─────────────────────────────────────────────────────────────
+        //Register new user with validation and duplicate checks
     public function register(): void
     {
         $body     = Request::body();
@@ -60,7 +60,7 @@ class AuthController
         $email    = trim($body['email']    ?? '');
         $password = $body['password']      ?? '';
 
-        // ── Validation ───────────────────────────────────────────────────────
+        //Validation 
         if (empty($username) || empty($password) || empty($email)) {
             Response::error('Username, email and password are required');
             return;

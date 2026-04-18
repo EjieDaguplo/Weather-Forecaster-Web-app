@@ -23,6 +23,7 @@ $router = new Router();
 
 // Auth routes
 $router->post('/api/auth/login', 'AuthController@login');
+$router->post('/api/auth/register', 'AuthController@register');
 $router->post('/api/auth/logout', 'AuthController@logout');
 $router->get('/api/auth/me', 'AuthController@me');
 
@@ -40,3 +41,6 @@ $router->delete('/api/admin/users/{id}', 'AdminController@deleteUser');
 $router->get('/api/admin/stats', 'AdminController@stats');
 
 $router->dispatch();
+
+//run php server with:
+//php -S localhost:8000 -t public
