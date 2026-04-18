@@ -67,6 +67,26 @@ class AdminController
         $db = Database::getInstance();
 
         $data = [];
+
+        if (isset($body['username'])) {
+            $username = trim($body['username']);
+            if (empty($username)) {
+                Response::error('Username cannot be empty');
+                return;
+            }
+            // Check for duplicate username (excluding current user)
+            $existing = $db->query('users', [
+                'username' => "eq.$username",
+                'id'       => "neq.$id",
+                'select'   => 'id',
+            ]);
+            if (!empty($existing)) {
+                Response::error('Username already taken', 409);
+                return;
+            }
+            $data['username'] = $username;
+        }
+
         if (isset($body['role'])) {
             if (!in_array($body['role'], ['user', 'admin'])) {
                 Response::error('Invalid role');
@@ -74,7 +94,8 @@ class AdminController
             }
             $data['role'] = $body['role'];
         }
-        if (isset($body['password'])) {
+
+        if (!empty($body['password'])) {
             $data['password_hash'] = password_hash($body['password'], PASSWORD_BCRYPT);
         }
 

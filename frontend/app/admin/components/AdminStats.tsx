@@ -1,5 +1,5 @@
 "use client";
-import { Users, Activity, Database, TrendingUp } from "lucide-react";
+import { Users, Activity, TrendingUp, Database } from "lucide-react";
 
 export default function AdminStats({
   stats,
@@ -13,13 +13,13 @@ export default function AdminStats({
       label: "Total Users",
       value: stats?.total_users ?? "--",
       icon: Users,
-      color: "var(--accent-cyan)",
+      color: "#22d3ee",
     },
     {
       label: "Predictions Today",
       value: stats?.predictions_today ?? "--",
       icon: Activity,
-      color: "var(--accent-gold)",
+      color: "#facc15",
     },
     {
       label: "Total Predictions",
@@ -36,21 +36,22 @@ export default function AdminStats({
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 fade-in">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {items.map((item) => (
-        <div key={item.label} className="glass rounded-2xl p-5">
+        <div
+          key={item.label}
+          className="bg-slate-900 border border-slate-800/60 p-5"
+        >
           <div className="flex items-center gap-2 mb-3">
             <item.icon className="w-4 h-4" style={{ color: item.color }} />
-            <span className="text-xs font-mono text-white/30 uppercase tracking-widest">
+            <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">
               {item.label}
             </span>
           </div>
           {loading ? (
-            <div className="h-8 w-16 rounded shimmer" />
+            <div className="h-8 w-16 bg-slate-800 animate-pulse" />
           ) : (
-            <p className="font-display text-3xl font-bold text-white">
-              {item.value}
-            </p>
+            <p className="text-3xl font-black text-white">{item.value}</p>
           )}
         </div>
       ))}
