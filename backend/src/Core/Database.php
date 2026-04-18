@@ -9,8 +9,11 @@ class Database
 
     private function __construct()
     {
-        $this->baseUrl = rtrim($_ENV['SUPABASE_URL'], '/') . '/rest/v1';
-        $this->apiKey = $_ENV['SUPABASE_ANON_KEY']; 
+        $url    = $_ENV['SUPABASE_URL']  ?? getenv('SUPABASE_URL')  ?? '';
+        $key    = $_ENV['SUPABASE_KEY']  ?? getenv('SUPABASE_KEY')  ?? '';
+
+        $this->baseUrl = rtrim($url, '/') . '/rest/v1';
+        $this->apiKey  = $key;
     }
 
     public static function getInstance(): self
@@ -25,11 +28,10 @@ class Database
     {
         $url = $this->baseUrl . '/' . $table;
         if (!empty($params)) {
-            $url .= '?' . $this->buildQuery($params);
+            $url .= '?' . http_build_query($params);
         }
         return $this->request('GET', $url);
     }
-
 
     public function insert(string $table, array $data): array
     {
@@ -39,76 +41,46 @@ class Database
 
     public function update(string $table, array $data, array $filters): array
     {
-        $url = $this->baseUrl . '/' . $table . '?' . $this->buildQuery($filters);
+        $url = $this->baseUrl . '/' . $table . '?' . http_build_query($filters);
         return $this->request('PATCH', $url, $data, ['Prefer: return=representation']);
     }
 
     public function delete(string $table, array $filters): array
     {
-        $url = $this->baseUrl . '/' . $table . '?' . $this->buildQuery($filters);
+        $url = $this->baseUrl . '/' . $table . '?' . http_build_query($filters);
         return $this->request('DELETE', $url);
     }
-    // Helper to build query string for filters
-    private function buildQuery(array $filters): string
+
+    private function request(string $method, string $url, array $body = [], array $extraHeaders = []): array
     {
-        $parts = [];
-        foreach ($filters as $key => $value) {
-            $parts[] = urlencode($key) . '=' . $value;
+        $ch      = curl_init($url);
+        $headers = [
+            "apikey: {$this->apiKey}",
+            "Authorization: Bearer {$this->apiKey}",
+            "Content-Type: application/json",
+            ...$extraHeaders,
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_HTTPHEADER     => $headers,
+        ]);
+
+        if (!empty($body)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
         }
-        return implode('&', $parts);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $decoded = json_decode($response, true);
+
+        if ($httpCode >= 400) {
+            throw new \RuntimeException($decoded['message'] ?? 'Database error', $httpCode);
+        }
+
+        return $decoded ?? [];
     }
-
-   private function request(string $method, string $url, array $body = [], array $extraHeaders = []): array
-{
-    $ch = curl_init($url);
-    $headers = [
-        "apikey: {$this->apiKey}",
-        "Authorization: Bearer {$this->apiKey}",
-        "Content-Type: application/json",
-        ...$extraHeaders,
-    ];
-
-    // Debug cert
-    $certPath = realpath(__DIR__ . '/../../cacert.pem');
-    error_log("CERT EXISTS: " . (file_exists($certPath) ? 'YES' : 'NO'));
-    error_log("CERT PATH: " . $certPath);
-
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST  => $method,
-        CURLOPT_HTTPHEADER     => $headers,
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_CAINFO         => $certPath,
-    ]);
-
-    if (!empty($body)) {
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-    }
-
-    // Debug request
-    // error_log("DEBUG HEADERS SENT: " . implode(' | ', $headers));
-    // error_log("DEBUG FULL URL: " . $url);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    // if (curl_errno($ch)) {
-    //     error_log("CURL ERROR CODE: " . curl_errno($ch));
-    //     error_log("CURL ERROR MSG: " . curl_error($ch));
-    // }
-
-    // Debug response
-    // error_log("DEBUG HTTP CODE: " . $httpCode);
-    // error_log("DEBUG RESPONSE: " . $response);
-
-    curl_close($ch);
-
-    $decoded = json_decode($response, true);
-
-    if ($httpCode >= 400) {
-        throw new \RuntimeException($decoded['message'] ?? 'Database error', $httpCode);
-    }
-
-    return $decoded ?? [];
-}
 }

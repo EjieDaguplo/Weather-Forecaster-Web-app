@@ -6,19 +6,21 @@ use Firebase\JWT\Key;
 
 class Auth
 {
-    private static string $secret;
-
     private static function getSecret(): string
     {
-        return $_ENV['JWT_SECRET'] ?? 'fallback_secret';
+        return $_ENV['JWT_SECRET'] ?? getenv('JWT_SECRET') ?? 'fallback_secret';
+    }
+
+    private static function getExpiry(): int
+    {
+        return (int)($_ENV['JWT_EXPIRY'] ?? getenv('JWT_EXPIRY') ?? 604800);
     }
 
     public static function generateToken(array $payload): string
     {
-        $expiry = (int)($_ENV['JWT_EXPIRY'] ?? 604800);
         $payload = array_merge($payload, [
             'iat' => time(),
-            'exp' => time() + $expiry,
+            'exp' => time() + self::getExpiry(),
         ]);
         return JWT::encode($payload, self::getSecret(), 'HS256');
     }
