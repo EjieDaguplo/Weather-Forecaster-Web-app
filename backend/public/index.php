@@ -23,19 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $router = new Router();
 
-// ── Auth routes ──────────────────────────────────────────────────────────────
+//Auth routes
 $router->post('/api/auth/login',    'AuthController@login');
 $router->post('/api/auth/register', 'AuthController@register');
 $router->post('/api/auth/logout',   'AuthController@logout');
 $router->get('/api/auth/me',        'AuthController@me');
 
-// ── Weather routes ───────────────────────────────────────────────────────────
+// Weather routes
 $router->get('/api/weather/current',  'WeatherController@current');
 $router->get('/api/weather/forecast', 'WeatherController@forecast');
 $router->post('/api/weather/predict', 'WeatherController@predict');
 $router->get('/api/weather/history',  'WeatherController@history');
 
-// ── Admin routes ─────────────────────────────────────────────────────────────
+// Admin routes
 $router->get('/api/admin/users',         'AdminController@listUsers');
 $router->post('/api/admin/users',        'AdminController@createUser');
 $router->put('/api/admin/users/{id}',    'AdminController@updateUser');

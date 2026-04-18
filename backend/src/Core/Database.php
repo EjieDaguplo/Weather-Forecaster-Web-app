@@ -10,7 +10,7 @@ class Database
     private function __construct()
     {
         $url    = $_ENV['SUPABASE_URL']  ?? getenv('SUPABASE_URL')  ?? '';
-        $key    = $_ENV['SUPABASE_KEY']  ?? getenv('SUPABASE_KEY')  ?? '';
+        $key    = $_ENV['SUPABASE_ANON_KEY']  ?? getenv('SUPABASE_ANON_KEY')  ?? '';
 
         $this->baseUrl = rtrim($url, '/') . '/rest/v1';
         $this->apiKey  = $key;
